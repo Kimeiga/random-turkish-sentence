@@ -6,26 +6,7 @@
     .getVoices()
     .filter((v) => v.lang.startsWith("tr"))[0];
 
-  var decodeEntities = (function () {
-    // this prevents any overhead from creating the object each time
-    var element = document.createElement("div");
-
-    function decodeHTMLEntities(str) {
-      if (str && typeof str === "string") {
-        // strip script/html tags
-        str = str.replace(/<script[^>]*>([\S\s]*?)<\/script>/gim, "");
-        str = str.replace(/<\/?\w(?:[^"'>]|"[^"]*"|'[^']*')*>/gim, "");
-        element.innerHTML = str;
-        str = element.textContent;
-        element.textContent = "";
-      }
-
-      return str;
-    }
-
-    return decodeHTMLEntities;
-  })();
-
+  console.log(voice);
   // import pos from "pos";
   // import chunker from "pos-chunker";
 
@@ -469,6 +450,7 @@ function getIndividualWordTranslations() {
 <hr style="margin: 1rem" />
 <p id="enText" style="margin: 1.5rem;" />
 
+{#if voice}
 <button
   on:click={() => {
     msg.text = turkishText;
@@ -478,6 +460,7 @@ function getIndividualWordTranslations() {
     window.speechSynthesis.speak(msg);
   }}>Speak sentence</button
 >
+{/if}
 
 <button
   style="margin-left: 0.5rem;"
