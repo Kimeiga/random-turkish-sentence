@@ -1,3 +1,6 @@
+<!-- a284151a462b5b9bd2448ff75d2fe7744f14d394 -->
+<!-- api key for nlp cloud -->
+
 <script>
   let voice = window.speechSynthesis
     .getVoices()
@@ -23,48 +26,9 @@
     return decodeHTMLEntities;
   })();
 
-  // import axios from "axios";
   // import pos from "pos";
   // import chunker from "pos-chunker";
 
-  let simplified = true;
-
-  // import cedict from "coupling-dict-chinese";
-  // cedict.searchByChinese("世界", (words) => {
-  //   console.log(words);
-  // });
-
-  // import RakutenMA from "rakutenma";
-  // import * as model_zh from "./model_zh.json";
-  // import chardic from "./zh_chardic";
-  // import * as HanZenKaku from "./hanzenkaku";
-
-  // let rma_zh = new RakutenMA(model_zh);
-  // rma_zh.featset = RakutenMA.default_featset_zh;
-  // rma_zh.hash_func = RakutenMA.create_hash_func(15);
-  // rma_zh.ctype_func = RakutenMA.create_ctype_chardic_func(chardic);
-
-  // let tokens = rma_zh.tokenize(
-  //   HanZenKaku.f_hs2fs(HanZenKaku.f_hw2fw(HanZenKaku.f_h2z("我是中国人。")))
-  // );
-
-  // if (tokens) console.log(RakutenMA.tokens2string(tokens));
-
-  // let rma = new RakutenMA(model);
-  // rma.featset = RakutenMA.default_featset_zh;
-  // rma.hash_func = RakutenMA.create_hash_func(15);
-
-  // console.log(rma.tokenize(HanZenKaku.hs2fs(HanZenKaku.hw2fw(HanZenKaku.h2z("我是中国人。")))));
-
-  // import chinesetokenizer from "chinese-tokenizer";
-  // let tokenize = chinesetokenizer.loadFile("./cedict_ts.u8");
-
-  // console.log(JSON.stringify(tokenize("我是中国人。"), null, "  "));
-  // console.log(JSON.stringify(tokenize("我是中國人。"), null, "  "));
-
-  // rma = new RakutenMA(model);
-  // rma.featset = RakutenMA.default_featset_ja;
-  // rma.hash_func = RakutenMA.create_hash_func(15);
 
   function makeid(length) {
     let result = "";
@@ -77,8 +41,9 @@
     return result;
   }
   let translationText;
-  let chineseText;
-  let traditionalChineseText;
+  let turkishText;
+  // let chineseText;
+  // let traditionalChineseText;
   let pinyinTextList;
   $: rubyTexts = [];
 
@@ -162,11 +127,29 @@
   //   document.body.style.backgroundImage = backgroundImageURL;
   // }
 
+function getIndividualWordTranslations() {
+  Promise.all(
+      rubyTexts.map((rubyText) =>
+        fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=tr&tl=en&dt=t&q=" + rubyText.word)
+          .then((response) => response.json())
+          .catch((e) => console.error(e))
+      )
+    )
+    .then((texts) => {
+      console.log(texts);
+      for (let i = 0; i < texts.length; i++) {
+        rubyTexts[i].translation = texts[i][0][0][0];
+      }
+
+      console.log(rubyTexts);
+    })
+}
+
   (async () => {
     const seed = makeid(4);
     console.log(seed);
     let a = await fetch(
-      "https://tatoeba.elnu.com/?from=cmn&orphans=no&sort=random&to=eng&trans_filter=limit&trans_to=eng&unapproved=no&limit=1&rand_seed=" +
+      "https://tatoeba.elnu.com/?from=tur&orphans=no&sort=random&to=eng&trans_filter=limit&trans_to=eng&unapproved=no&limit=1&rand_seed=" +
         // "https://dev.tatoeba.org/en/api_v0/search?from=cmn&orphans=no&sort=random&to=eng&trans_filter=limit&trans_to=eng&unapproved=no&rand_seed=" +
         seed
       // WUHp sex
@@ -186,71 +169,9 @@
 
     console.log(r);
 
-    if (r.script == "Hans") {
-      chineseText = r.text;
-      traditionalChineseText = r.transcriptions[0].text;
-    } else if (r.script == "Hant") {
-      traditionalChineseText = r.text;
-      chineseText = r.transcriptions[0].text;
-    } else {
-      chineseText = r.transcriptions[0].text;
-      traditionalChineseText = r.text;
-    }
+    turkishText = r.text;
 
-    // change fullwidth final punctuation to halfwidth for better centering
-    if (chineseText[chineseText.length - 1] == "。") {
-      chineseText = chineseText.substring(0, chineseText.length - 1) + "｡";
-    } else if (chineseText[chineseText.length - 1] == "？") {
-      chineseText = chineseText.substring(0, chineseText.length - 1) + "?";
-    }
-
-    if (traditionalChineseText[traditionalChineseText.length - 1] == "。") {
-      traditionalChineseText =
-        traditionalChineseText.substring(0, traditionalChineseText.length - 1) +
-        "｡";
-    } else if (
-      traditionalChineseText[traditionalChineseText.length - 1] == "？"
-    ) {
-      traditionalChineseText =
-        traditionalChineseText.substring(0, traditionalChineseText.length - 1) +
-        "?";
-    }
-
-    // chineseText = "等他下次来时，我会把这件事告诉他。";
-    // chineseText = "我听到这个消息时，简直不能相信自己的耳朵。";
-    // chineseText = "瑪麗亞和納塔利婭去購物。他們為自己買些東西。";
-
-    // if (chineseText[chineseText.length - 1] == "。") {
-    //   chineseText = chineseText.slice(0, -1);
-    // }
-
-    // document.getElementById("cmnText").innerText = chineseText;
-
-    pinyinTextList = decodeEntities(r.transcriptions[1].html);
-    pinyinTextList = pinyinTextList.split(/[, .?";!]/);
-    // pinyinTextList = r.transcriptions[1].html.split("[\\&\\;]");
-    // pinyinTextList =
-    //   "Mǎl&igrave;y&agrave; h&eacute; n&agrave; tǎ l&igrave; y&agrave; q&ugrave; g&ograve;uw&ugrave;. tāmen w&egrave;i z&igrave;jǐ mǎi xiē dōngxi.".split(
-    //     /[, .]/
-    //   );
-    // pinyinTextList =
-    //   "Wǒ tīngd&agrave;o zh&egrave;ge xiāoxi sh&iacute;, jiǎnzh&iacute; b&ugrave; n&eacute;ng xiāngx&igrave;n z&igrave;jǐ de ěrduo.".split(
-    //     /[, ]/
-    //   );
-    // pinyinTextList =
-    //   "Děng tā xi&agrave;c&igrave; l&aacute;i sh&iacute;, wǒ hu&igrave; bǎ zh&egrave; ji&agrave;n sh&igrave; g&agrave;osu tā.".split(
-    //     /[, ]/
-    // );
-    // console.log(pinyinTextList);
-
-    // for (let p of pinyinTextList) {
-    //   const node = document.createElement("p");
-    //   // const textnode = document.createTextNode(p);
-    //   node.innerHTML = p;
-    //   document.getElementById("pinyinTextDiv").appendChild(node);
-    // }
-
-    // document.getElementById("pinyinText").innerHTML = r.transcriptions[1].html;
+    
 
     let translation = r.translations.filter((a) => a.length > 0);
     translationText = translation[0][0].text;
@@ -262,77 +183,28 @@
 
     document.getElementById("enText").innerText = translationText;
 
+    // prep ruby texts for translations to come in
+    rubyTexts = turkishText.split(" ").map(x => {
+      return {
+        word: x,
+      };
+    });
+    
     // let extractedVerbs = [];
     // let verbs = chunker.chunk(tags, "[{ tag: VB|VBP }]");
-
+    
     // for (let n of verbs.match(/\{([^}]+)\}/)) {
-    //   extractedVerbs.push(n.match(/\{(.*)\//)[1]);
-    // }
-    // console.log("extractedVerbs");
-    // console.log(extractedVerbs);
-
-    // figure out pinyin
-    let numeralPinyins = r.transcriptions[1].text.split(/[, .?";!”“]/);
-    // numeralPinyins =
-    //   "Ma3li4ya4 he2 na4 ta3 li4 ya4 qu4 gou4wu4. ta1men5 wei4 zi4ji3 mai3 xie1 dong1xi5.".split(
-    //     /[, .]/
-    //   );
-    // numeralPinyins =
-    //   "Wo3 ting1dao4 zhe4ge5 xiao1xi5 shi2, jian3zhi2 bu4 neng2 xiang1xin4 zi4ji3 de5 er3duo5.".split(
-    //     /[, ]/
-    //   );
-    // numeralPinyins =
-    //   "Deng3 ta1 xia4ci4 lai2 shi2, wo3 hui4 ba3 zhe4 jian4 shi4 gao4su5 ta1.".split(
-    //     /[, ]/
-    //   );
-    // console.log(numeralPinyins);
-    let syllableArray = [];
-    for (let n of numeralPinyins) {
-      let syllableCount = n.match(/\d/g)?.length ?? (n.length || 1);
-      syllableArray.push(syllableCount);
-    }
-    // console.log("syllableArray");
-    // console.log(syllableArray);
-
-    let accChinese = 0;
-    for (let [i, n] of syllableArray.entries()) {
-      // const node = document.createElement("ruby");
-      // if (chineseText[accChinese] == "，") {
-      //   node.innerHTML = chineseText.slice(accChinese, accChinese + 1);
-      //   rubyElement.appendChild(node);
-      //   accChinese++;
-      //   accPinyin += n;
-
-      //   continue;
-      // } else {
-      // console.log(
-      //   chineseText.slice(accChinese, accChinese + n),
-      //   pinyinTextList[i],
-      //   n
-      // );
-      // node.innerHTML =
-      //   chineseText.slice(accChinese, accChinese + n) +
-      //   `<rt>${pinyinTextList[i]}</rt>`;
-      // rubyElement.appendChild(node);
-
-      rubyTexts = [
-        ...rubyTexts,
-        {
-          chars: chineseText.slice(accChinese, accChinese + n),
-          traditionalChars: traditionalChineseText.slice(
-            accChinese,
-            accChinese + n
-          ),
-          text: pinyinTextList[i],
-        },
-      ];
-
-      accChinese += n;
-      // accPinyin += n;
-      // }
+      //   extractedVerbs.push(n.match(/\{(.*)\//)[1]);
+        // }
+        // console.log("extractedVerbs");
+        // console.log(extractedVerbs);
+        
+        
+        getIndividualWordTranslations();
+        
+        SetBackgroundImage();
     }
 
-    getIndividualWordTranslations();
 
     //   const fetchNames = async () => {
     //   try {
@@ -437,10 +309,10 @@
 
     // console.log(rubyTexts);
 
-    SetBackgroundImage();
-  })();
+  )();
   let msg = new SpeechSynthesisUtterance();
 
+  /*
   function getIndividualWordTranslations() {
     // todo ignore ? in rubyText.chars
     // new more efficient way to get definitions with Promise.all!
@@ -482,7 +354,7 @@
           // structural particle: used after a verb , linking it to following phrase indicating effect, degree, possibility etc
 
           if (res.length) {
-            let first = res[0].definitions.match(/^[^;]*/);
+            let first = res[0].definitions.match(/^[^;]/);
             if (first) {
               r = first[0];
 
@@ -510,6 +382,7 @@
         }
       });
   }
+  */
 </script>
 
 <!-- 
@@ -547,6 +420,11 @@
     Click on the Vite and Svelte logos to learn more
   </p>
 </main> -->
+
+{#if !turkishText}
+<p>Generating Turkish Sentence</p>
+{:else}
+
 <div id="container">
   <!-- <p id="cmnText" />
   <div id="pinyinTextDiv" /> -->
@@ -556,38 +434,36 @@
     {/each}
   {/if} -->
   <!-- <div id="ruby" /> -->
-  <div id="ruby">
+  <!-- <p id="turkishText">{turkishText}</p> -->
+
+    <div id="ruby" style="display: flex; flex-wrap: wrap;  align-items: center; gap: calc(0.5rem + 0.45vw); justify-content: center;">
     <!-- {#if chineseText && (chineseText[chineseText.length - 1] == "。" || chineseText[chineseText.length - 1] == "？")}
       <span>&ensp;</span>
     {/if} -->
-    {#if rubyTexts.length > 0}
-      {#each rubyTexts as r}
-        <ruby class="main-ruby" style="ruby-position: under;">
-          <div
-            style="display: flex; flex-direction:column;align-items: center;"
-          >
-            <ruby style="ruby-position: over; ">
-              {#if simplified}
-                {r.chars}
-              {:else}
-                {r.traditionalChars}
-              {/if}
-              <rt>{@html r.text}</rt>
-            </ruby>
-
-            <p
-              style="font-size: calc(0.5rem + 0.45vw); word-wrap: break-word;width: fit-content; text-align: center; margin: 0;"
+      {#if rubyTexts.length > 0}
+        {#each rubyTexts as r}
+            <div
+              style="display: flex; flex-direction: column; align-items: center;"
             >
-              {r.def ?? ""}
-            </p>
-          </div>
-        </ruby>
-      {/each}
-    {:else}
-      <small>Generating Chinese Sentence...</small>
-    {/if}
+              <p
+                style="font-size: calc(1rem + 0.45vw); word-wrap: break-word;width: fit-content; text-align: center; margin: 0;"
+              >
+                {r.translation ?? " "}
+    </p>
+
+              <span style="font-size: calc(3rem + 0.45vw);">
+                  {r.word}
+              </span>
+
+              
+            </div>
+        {/each}
+      {:else}
+        <small>Generating Chinese Sentence...</small>
+      {/if}
   </div>
 </div>
+{/if}
 
 <!-- <p id="pinyinText" /> -->
 <hr style="margin: 1rem" />
@@ -595,8 +471,8 @@
 
 <button
   on:click={() => {
-    msg.text = chineseText;
-    msg.lang = "zh-CN";
+    msg.text = turkishText;
+    msg.lang = "tr";
     msg.voice = voice;
     msg.rate = 0.8;
     window.speechSynthesis.speak(msg);
@@ -607,50 +483,13 @@
   style="margin-left: 0.5rem;"
   on:click={() => {
     navigator.clipboard.writeText(
-      simplified ? chineseText : traditionalChineseText
+      turkishText
     );
-  }}>Copy Chinese Sentence</button
+  }}>Copy Turkish Sentence</button
 >
 
-<button
-  style="margin-left: 0.5rem;"
-  on:click={() => {
-    // console.log(chineseText + " -> " + converterToTraditional(chineseText));
-
-    // chineseText = converterToTraditional(chineseText);
-
-    simplified = !simplified;
-
-    // if (simplified) {
-    //   rubyTexts = rubyTexts.map((r) => ({
-    //     text: r.text,
-    //     chars: converterToTraditional(r.chars),
-    //   }));
-    //   simplified = false;
-    // } else {
-    //   rubyTexts = rubyTexts.map((r) => ({
-    //     text: r.text,
-    //     chars: converterToSimplified(r.chars),
-    //   }));
-    //   simplified = true;
-    // }
-  }}
->
-  Change to {#if simplified}
-    Traditional
-  {:else}
-    Simplified
-  {/if} Characters
-</button>
 <br />
 <br />
-{#if voice && voice.lang == "zh-HK"}
-  <small>
-    The only Chinese voice on your browser is a Cantonese one lol. <br /> This
-    is probably MacOS Safari. <br /> Enjoy the Canto pronunciations but they will
-    be different than Mandarin just fair warning mate.
-  </small>
-{/if}
 
 <!-- <style>
   .logo {
@@ -669,7 +508,7 @@
   }
 </style> -->
 <style>
-  #pinyinTextDiv {
+    #pinyinTextDiv {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -680,11 +519,16 @@
   #pinyinTextDiv p {
     font-size: 1.8rem;
   }
+  
+  #turkishText {
+    font-size: 2rem;
+  }
 
   #container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    padding: 0.5rem;
   }
 </style>

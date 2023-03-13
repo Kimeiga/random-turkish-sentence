@@ -104,7 +104,7 @@ body {
   text-align: center;
 
   /* font-family: "Noto Serif SC", serif; */
-  font-family: serif, "SongTi SC", "KaiTi";
+  font-family: "Palatino Linotype", Palatino, Palladio, "URW Palladio L", "Book Antiqua", Baskerville, "Bookman Old Style", "Bitstream Charter", "Nimbus Roman No9 L", Garamond, "Apple Garamond", "ITC Garamond Narrow", "New Century Schoolbook", "Century Schoolbook", "Century Schoolbook L", Georgia, serif;
 
   /* to prevent overflow */
   width: 100vw;
@@ -118,50 +118,11 @@ body {
   font-size: 4rem;
 }
 
-#pinyinText {
-  /* font-size: 1.8rem; */
-  font-size: calc(0.4rem + 1vw);
-}
-
 #enText {
   /* font-size: 1.6rem; */
   font-size: calc(0.8rem + 1vw);
 }
 
-#ruby {
-  font-size: calc(2.2rem + 4vw);
-  font-weight: 900;
-
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: center;
-  justify-content: center;
-  align-items: baseline;
-
-  /* offset period */
-  /* position: relative; */
-  /* left: 0.5ch; */
-}
-
-#ruby rt {
-  font-weight: 100;
-  font-size: 25%;
-  position: relative;
-  top: -1rem;
-}
-
-ruby {
-  display: inline-flex;
-  flex-direction: column-reverse;
-}
-
-rb,
-rt {
-  display: inline;
-  line-height: 1;
-  text-align: center;
-}
 
 button {
   /* For your border-radius: */
@@ -186,8 +147,4 @@ button:hover {
   background: #222;
   cursor: pointer;
   opacity: 0.4;
-}
-
-.main-ruby {
-  margin: 1rem 0;
 }
