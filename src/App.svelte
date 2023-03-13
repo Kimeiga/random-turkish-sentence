@@ -4,7 +4,7 @@
 <script>
   let voice = window.speechSynthesis
     .getVoices()
-    .filter((v) => v.lang.startsWith("zh"))[0];
+    .filter((v) => v.lang.startsWith("tr"))[0];
 
   var decodeEntities = (function () {
     // this prevents any overhead from creating the object each time
