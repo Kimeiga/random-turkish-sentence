@@ -472,7 +472,7 @@ function getIndividualWordTranslations() {
 <button
   on:click={() => {
     msg.text = turkishText;
-    msg.lang = "tr";
+    msg.lang = "tr-TR";
     msg.voice = voice;
     msg.rate = 0.8;
     window.speechSynthesis.speak(msg);
