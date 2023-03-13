@@ -120,7 +120,7 @@ body {
 
 #enText {
   /* font-size: 1.6rem; */
-  font-size: calc(0.8rem + 1vw);
+  font-size: calc(1rem + 1vw);
 }
 
 
@@ -139,7 +139,7 @@ button {
   outline: 0;
   border: 0;
 
-  font-size: calc(0.4rem + 0.4vw);
+  font-size: calc(0.9rem + 0.1vw);
 }
 
 /* Then maybe something like */

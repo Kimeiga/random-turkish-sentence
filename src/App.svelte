@@ -446,12 +446,12 @@ function getIndividualWordTranslations() {
               style="display: flex; flex-direction: column; align-items: center;"
             >
               <p
-                style="font-size: calc(1rem + 0.45vw); word-wrap: break-word;width: fit-content; text-align: center; margin: 0;"
+                style="font-size: calc(1rem + 0.45vw); word-wrap: break-word;width: fit-content; text-align: center; margin: 0; font-weight: normal"
               >
                 {r.translation ?? " "}
     </p>
 
-              <span style="font-size: calc(3rem + 0.45vw);">
+              <span style="font-size: calc(3rem + 0.45vw); font-weight: bold;">
                   {r.word}
               </span>
 
