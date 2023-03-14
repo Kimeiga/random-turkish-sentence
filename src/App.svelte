@@ -1,15 +1,17 @@
-<!-- a284151a462b5b9bd2448ff75d2fe7744f14d394 -->
-<!-- api key for nlp cloud -->
-
+<!-- api key for nlp cloud: a284151a462b5b9bd2448ff75d2fe7744f14d394 -->
 <script>
-  let voice = window.speechSynthesis
-    .getVoices()
-    .filter((v) => v.lang.startsWith("tr"))[0];
+  $: voice = null;
+  window.speechSynthesis.onvoiceschanged = function () {
+    voice = window.speechSynthesis
+      .getVoices()
+      .filter((v) => v.lang.startsWith("tr"))[0];
+  };
 
-  console.log(voice);
+  // debugger;
+
+  // console.log(voice);
   // import pos from "pos";
   // import chunker from "pos-chunker";
-
 
   function makeid(length) {
     let result = "";
@@ -108,23 +110,25 @@
   //   document.body.style.backgroundImage = backgroundImageURL;
   // }
 
-function getIndividualWordTranslations() {
-  Promise.all(
+  function getIndividualWordTranslations() {
+    Promise.all(
       rubyTexts.map((rubyText) =>
-        fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=tr&tl=en&dt=t&q=" + rubyText.word)
+        fetch(
+          "https://translate.googleapis.com/translate_a/single?client=gtx&sl=tr&tl=en&dt=t&q=" +
+            rubyText.word
+        )
           .then((response) => response.json())
           .catch((e) => console.error(e))
       )
-    )
-    .then((texts) => {
+    ).then((texts) => {
       console.log(texts);
       for (let i = 0; i < texts.length; i++) {
         rubyTexts[i].translation = texts[i][0][0][0];
       }
 
       console.log(rubyTexts);
-    })
-}
+    });
+  }
 
   (async () => {
     const seed = makeid(4);
@@ -152,8 +156,6 @@ function getIndividualWordTranslations() {
 
     turkishText = r.text;
 
-    
-
     let translation = r.translations.filter((a) => a.length > 0);
     translationText = translation[0][0].text;
     // translationText =
@@ -165,132 +167,128 @@ function getIndividualWordTranslations() {
     document.getElementById("enText").innerText = translationText;
 
     // prep ruby texts for translations to come in
-    rubyTexts = turkishText.split(" ").map(x => {
+    rubyTexts = turkishText.split(" ").map((x) => {
       return {
         word: x,
       };
     });
-    
+
     // let extractedVerbs = [];
     // let verbs = chunker.chunk(tags, "[{ tag: VB|VBP }]");
-    
+
     // for (let n of verbs.match(/\{([^}]+)\}/)) {
-      //   extractedVerbs.push(n.match(/\{(.*)\//)[1]);
-        // }
-        // console.log("extractedVerbs");
-        // console.log(extractedVerbs);
-        
-        
-        getIndividualWordTranslations();
-        
-        SetBackgroundImage();
-    }
-
-
-    //   const fetchNames = async () => {
-    //   try {
-    //     const res = await Promise.all([
-    //       axios.get("https://chinese-dictionary.azurewebsites.net/" + rubyText.chars),
-    //       axios.get("./names-mid.json"),
-    //       axios.get("./names-old.json")
-    //     ]);
-    //     const data = res.map((res) => res.data);
-    //     console.log(data.flat());
-    //   } catch {
-    //     throw Error("Promise failed");
-    //   }
-    // };
-
-    // for (let rubyText of rubyTexts) {
-    //   if (rubyText.chars == "?" || rubyText.chars == "｡") {
-    //     return;
-    //   }
-    //   let res = await (
-    //     await axios.get(
-    //       "https://chinese-dictionary.azurewebsites.net/" + rubyText.chars
-    //     )
-    //   ).data;
-    //   // console.log(r);
-    //   console.log(res);
-
-    //   console.log(res.length && res[0].definitions);
-    //   let r;
-
-    //   // filter out surnames
-    //   let res2 = res.filter((r) => !/[A-Z]/.test(r.pronunciation));
-    //   res = res2.length ? res2 : res;
-
-    //   // filter out variants?
-    //   let res3 = res.filter((r) => !/variant/.test(r.definitions));
-    //   console.log(res3);
-    //   res = res3.length ? res3 : res;
-
-    //   if (res.length) {
-    //     let first = res[0].definitions.match(/^[^;]*/);
-    //     if (first) {
-    //       r = first[0];
-
-    //       console.log(r);
-
-    //       // you (informal, as opposed to courteous 您[nin2]) -> you
-    //       let r2 = r.replace(/\([^()]*\)/g, "").trim();
-    //       r = r2.length ? r2 : r;
-    //       console.log("r");
-    //       console.log(r);
-    //     } else {
-    //       // no ;
-    //       r = res[0].definitions;
-
-    //       // you (informal, as opposed to courteous 您[nin2]) -> you
-    //       let r2 = r.replace(/\([^()]*\)/g, "").trim();
-    //       r = r2.length ? r2 : r;
-    //       console.log("r");
-    //       console.log(r);
-    //     }
-    //   }
-
-    //   rubyText.def = r;
-    //   rubyTexts = rubyTexts;
-    //   // console.log(rubyTexts);
+    //   extractedVerbs.push(n.match(/\{(.*)\//)[1]);
     // }
+    // console.log("extractedVerbs");
+    // console.log(extractedVerbs);
 
-    // if we are still missing a final ? we got to add it
-    // if (rubyTexts[rubyTexts.length - 1].text[rubyTexts[rubyTexts.length - 1].text.length - 1] == "?"){
-    //   if (rubyTexts[rubyTexts.length - 1].chars != "？"){
-    //     rubyTexts = [...rubyTexts, console.]
-    //   }
-    // }
+    getIndividualWordTranslations();
 
-    // get translations for each word!!
+    SetBackgroundImage();
+  })();
 
-    // for (let r of rubyTexts) {
+  //   const fetchNames = async () => {
+  //   try {
+  //     const res = await Promise.all([
+  //       axios.get("https://chinese-dictionary.azurewebsites.net/" + rubyText.chars),
+  //       axios.get("./names-mid.json"),
+  //       axios.get("./names-old.json")
+  //     ]);
+  //     const data = res.map((res) => res.data);
+  //     console.log(data.flat());
+  //   } catch {
+  //     throw Error("Promise failed");
+  //   }
+  // };
 
-    // }
+  // for (let rubyText of rubyTexts) {
+  //   if (rubyText.chars == "?" || rubyText.chars == "｡") {
+  //     return;
+  //   }
+  //   let res = await (
+  //     await axios.get(
+  //       "https://chinese-dictionary.azurewebsites.net/" + rubyText.chars
+  //     )
+  //   ).data;
+  //   // console.log(r);
+  //   console.log(res);
 
-    // let a = 0;
-    // let t = chineseText;
-    // for (let i = 0; i < syllableArray.length; i++) {
-    //   if(t[a] == "，"){
+  //   console.log(res.length && res[0].definitions);
+  //   let r;
 
-    //   }
-    //   else {
-    //     const n = syllableArray[i];
+  //   // filter out surnames
+  //   let res2 = res.filter((r) => !/[A-Z]/.test(r.pronunciation));
+  //   res = res2.length ? res2 : res;
 
-    //     console.log(i, n, pinyinTextList[i], t.slice(a, a+n))
-    //     a += n;
-    //   }
-    // }
+  //   // filter out variants?
+  //   let res3 = res.filter((r) => !/variant/.test(r.definitions));
+  //   console.log(res3);
+  //   res = res3.length ? res3 : res;
 
-    // for (let p of pinyinTextList) {
-    //   const node = document.createElement("p");
-    //   // const textnode = document.createTextNode(p);
-    //   node.innerHTML = p;
-    //   document.getElementById("pinyinTextDiv").appendChild(node);
-    // }
+  //   if (res.length) {
+  //     let first = res[0].definitions.match(/^[^;]*/);
+  //     if (first) {
+  //       r = first[0];
 
-    // console.log(rubyTexts);
+  //       console.log(r);
 
-  )();
+  //       // you (informal, as opposed to courteous 您[nin2]) -> you
+  //       let r2 = r.replace(/\([^()]*\)/g, "").trim();
+  //       r = r2.length ? r2 : r;
+  //       console.log("r");
+  //       console.log(r);
+  //     } else {
+  //       // no ;
+  //       r = res[0].definitions;
+
+  //       // you (informal, as opposed to courteous 您[nin2]) -> you
+  //       let r2 = r.replace(/\([^()]*\)/g, "").trim();
+  //       r = r2.length ? r2 : r;
+  //       console.log("r");
+  //       console.log(r);
+  //     }
+  //   }
+
+  //   rubyText.def = r;
+  //   rubyTexts = rubyTexts;
+  //   // console.log(rubyTexts);
+  // }
+
+  // if we are still missing a final ? we got to add it
+  // if (rubyTexts[rubyTexts.length - 1].text[rubyTexts[rubyTexts.length - 1].text.length - 1] == "?"){
+  //   if (rubyTexts[rubyTexts.length - 1].chars != "？"){
+  //     rubyTexts = [...rubyTexts, console.]
+  //   }
+  // }
+
+  // get translations for each word!!
+
+  // for (let r of rubyTexts) {
+
+  // }
+
+  // let a = 0;
+  // let t = chineseText;
+  // for (let i = 0; i < syllableArray.length; i++) {
+  //   if(t[a] == "，"){
+
+  //   }
+  //   else {
+  //     const n = syllableArray[i];
+
+  //     console.log(i, n, pinyinTextList[i], t.slice(a, a+n))
+  //     a += n;
+  //   }
+  // }
+
+  // for (let p of pinyinTextList) {
+  //   const node = document.createElement("p");
+  //   // const textnode = document.createTextNode(p);
+  //   node.innerHTML = p;
+  //   document.getElementById("pinyinTextDiv").appendChild(node);
+  // }
+
+  // console.log(rubyTexts);
   let msg = new SpeechSynthesisUtterance();
 
   /*
@@ -366,6 +364,8 @@ function getIndividualWordTranslations() {
   */
 </script>
 
+<!-- a284151a462b5b9bd2448ff75d2fe7744f14d394 -->
+
 <!-- 
 <svelte:head>
   <script type="text/javascript" src="./rakutenma.js" charset="UTF-8"></script>
@@ -403,47 +403,47 @@ function getIndividualWordTranslations() {
 </main> -->
 
 {#if !turkishText}
-<p>Generating Turkish Sentence</p>
+  <p>Generating Turkish Sentence</p>
 {:else}
-
-<div id="container">
-  <!-- <p id="cmnText" />
+  <div id="container">
+    <!-- <p id="cmnText" />
   <div id="pinyinTextDiv" /> -->
-  <!-- {#if pinyinTextList}
+    <!-- {#if pinyinTextList}
     {#each pinyinTextList as p}
       <p>{p}</p>
     {/each}
   {/if} -->
-  <!-- <div id="ruby" /> -->
-  <!-- <p id="turkishText">{turkishText}</p> -->
+    <!-- <div id="ruby" /> -->
+    <!-- <p id="turkishText">{turkishText}</p> -->
 
-    <div id="ruby" style="display: flex; flex-wrap: wrap;  align-items: center; gap: calc(0.5rem + 0.45vw); justify-content: center;">
-    <!-- {#if chineseText && (chineseText[chineseText.length - 1] == "。" || chineseText[chineseText.length - 1] == "？")}
+    <div
+      id="ruby"
+      style="display: flex; flex-wrap: wrap;  align-items: center; gap: calc(0.5rem + 0.45vw); justify-content: center;"
+    >
+      <!-- {#if chineseText && (chineseText[chineseText.length - 1] == "。" || chineseText[chineseText.length - 1] == "？")}
       <span>&ensp;</span>
     {/if} -->
       {#if rubyTexts.length > 0}
         {#each rubyTexts as r}
-            <div
-              style="display: flex; flex-direction: column; align-items: center;"
+          <div
+            style="display: flex; flex-direction: column; align-items: center;"
+          >
+            <p
+              style="font-size: calc(1rem + 0.45vw); word-wrap: break-word;width: fit-content; text-align: center; margin: 0; font-weight: normal"
             >
-              <p
-                style="font-size: calc(1rem + 0.45vw); word-wrap: break-word;width: fit-content; text-align: center; margin: 0; font-weight: normal"
-              >
-                {r.translation ?? " "}
-    </p>
+              {r.translation ?? " "}
+            </p>
 
-              <span style="font-size: calc(3rem + 0.45vw); font-weight: bold;">
-                  {r.word}
-              </span>
-
-              
-            </div>
+            <span style="font-size: calc(3rem + 0.45vw); font-weight: bold;">
+              {r.word}
+            </span>
+          </div>
         {/each}
       {:else}
-        <small>Generating Chinese Sentence...</small>
+        <small>Generating Turkish Sentence...</small>
       {/if}
+    </div>
   </div>
-</div>
 {/if}
 
 <!-- <p id="pinyinText" /> -->
@@ -451,23 +451,21 @@ function getIndividualWordTranslations() {
 <p id="enText" style="margin: 1.5rem;" />
 
 {#if voice}
-<button
-  on:click={() => {
-    msg.text = turkishText;
-    msg.lang = "tr-TR";
-    msg.voice = voice;
-    msg.rate = 0.8;
-    window.speechSynthesis.speak(msg);
-  }}>Speak sentence</button
->
+  <button
+    on:click={() => {
+      msg.text = turkishText;
+      msg.lang = "tr-TR";
+      msg.voice = voice;
+      msg.rate = 0.8;
+      window.speechSynthesis.speak(msg);
+    }}>Speak sentence</button
+  >
 {/if}
 
 <button
   style="margin-left: 0.5rem;"
   on:click={() => {
-    navigator.clipboard.writeText(
-      turkishText
-    );
+    navigator.clipboard.writeText(turkishText);
   }}>Copy Turkish Sentence</button
 >
 
@@ -491,7 +489,7 @@ function getIndividualWordTranslations() {
   }
 </style> -->
 <style>
-    #pinyinTextDiv {
+  #pinyinTextDiv {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -502,7 +500,7 @@ function getIndividualWordTranslations() {
   #pinyinTextDiv p {
     font-size: 1.8rem;
   }
-  
+
   #turkishText {
     font-size: 2rem;
   }
